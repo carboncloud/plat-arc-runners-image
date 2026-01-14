@@ -15,7 +15,7 @@ env:
 jobs:
 
   build-tag-push:
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
@@ -34,6 +34,4 @@ jobs:
       - name: Log in, build, and push
         run: |
           docker build --tag ${IMAGE_NAME}:${WF_IMAGE_TAG} .
-          docker save -o ${WF_IMAGE_TAG}.tar ${IMAGE_NAME}:${WF_IMAGE_TAG}
-          echo "${DOCKER_PASSWORD}" | skopeo login -u ${DOCKER_USER} --password-stdin ${DOCKER_REPO}
-          skopeo copy docker-archive://${PWD}/${WF_IMAGE_TAG}.tar docker://${DOCKER_REPO}/${IMAGE_NAME}:${WF_IMAGE_TAG}
+          docker push ${IMAGE_NAME}:${WF_IMAGE_TAG}

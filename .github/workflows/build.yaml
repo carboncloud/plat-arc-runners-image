@@ -33,5 +33,6 @@ jobs:
           fetch-depth: 0
       - name: Log in, build, and push
         run: |
+          echo "${DOCKER_PASSWORD}" | docker login -u ${DOCKER_USER} --password-stdin ${DOCKER_REPO}
           docker build --tag ${DOCKER_REPO}/${IMAGE_NAME}:${WF_IMAGE_TAG} .
           docker push ${DOCKER_REPO}/${IMAGE_NAME}:${WF_IMAGE_TAG}

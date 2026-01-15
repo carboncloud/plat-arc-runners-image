@@ -1,0 +1,46 @@
+name: Build ARC runner Image
+
+on:
+  push:
+    branches:
+      - "build-tests"
+
+env:
+  DOCKER_REPO: ghcr.io
+  DOCKER_USER: ${{ github.actor }}
+  DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+  IMAGE_NAME: ${{ github.repository }}
+  WF_IMAGE_TAG: "wf-${{ github.run_id }}"
+
+jobs:
+
+  build-tag-push:
+    runs-on: arc-runner-set
+    permissions:
+      contents: read
+      packages: write
+    env:
+      DOCKER_REPO: ghcr.io
+      DOCKER_USER: ${{ github.actor }}
+      DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      IMAGE_NAME: ${{ github.repository }}
+      WF_IMAGE_TAG: "wf-${{ github.run_id }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Log in, build, and push
+        run: |
+          echo "${DOCKER_PASSWORD}" | docker login -u ${DOCKER_USER} --password-stdin ${DOCKER_REPO}
+          docker build --tag ${DOCKER_REPO}/${IMAGE_NAME}:${WF_IMAGE_TAG} .
+  nix:
+    runs-on: arc-runner-set
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: NIX
+        run: nix -p yq
+          
